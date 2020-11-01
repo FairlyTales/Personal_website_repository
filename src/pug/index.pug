@@ -1,0 +1,16 @@
+extends global/layout
+
+block vars
+  - var js_page_id = "js-indexPage";
+  - var page_title = "";
+  - var page_decription = "";
+  - var page_keywords = "";
+
+block header
+  +pageHeader(js_page_id)
+
+block content
+  main.page-main
+
+block footer
+  +pageFooter(js_page_id)
