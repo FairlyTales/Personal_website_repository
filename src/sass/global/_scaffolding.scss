@@ -1,5 +1,4 @@
-@use 'global/variables' as vars;
-@use 'global/mixin' as mixins;
+//! прописать свой шрифт в @font-face и body
 
 @font-face {
   font-family: 'Oswald-Regular';

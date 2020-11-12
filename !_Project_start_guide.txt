@@ -1,6 +1,10 @@
-1) Provide package.json with name and description
-2) Write a readme.md
-3) run npm i
+	1) Provide package.json with name and description
+	2) Write a readme.md
+	3) run npm i
+	
+	
+	Выбери шрифты, цветовую схему, запиши это на бумажке, затем продолжай:
+
 4) Provide layout.pug with lang and fonts
 5) Provide sass/global/_scaffolding.scss with font params
 6) Start working

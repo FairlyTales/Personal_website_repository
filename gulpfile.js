@@ -78,6 +78,7 @@ let group_media_queries = require('gulp-group-css-media-queries'); // combines a
 let postcss = require('gulp-postcss'); // big plugin with sub-plugins for working with CSS
 let autoprefixer = require('autoprefixer'); // part of the postcss
 let cssnano = require('cssnano'); // CSS minifier, part of the postcss
+let tailwindcss = require('tailwindcss'); // tailwind cc
 
 // Javascript
 let terser = require('gulp-terser'); // JS minifier
@@ -155,7 +156,7 @@ function compileCSS() {
       .pipe(group_media_queries())
       //* remove comment bellow to also get non-min css
       // .pipe(dest(path.build.css))
-      .pipe(postcss([autoprefixer(), cssnano()]))
+      .pipe(postcss([tailwindcss(), autoprefixer(), cssnano()]))
       .pipe(
         rename({
           extname: '.min.css',
