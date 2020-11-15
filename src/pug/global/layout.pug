@@ -13,16 +13,17 @@ html(lang=page_language)
     meta(name='keywords', content=page_keywords)
     meta(name='viewport', content='width=device-width, initial-scale=1.0')
 
-    link(
-      rel='preload',
-      href=`/fonts/${external_font}.woff2`,
-      as='font',
-      crossorigin='anonymous'
-    )
-    link(rel='preload', href='/css/style.min.css', as='style')
+    //- решил использовать веб-безопасный шрифт
+    //- link(
+    //-   rel='preload',
+    //-   href=`/fonts/${external_font}.woff2`,
+    //-   as='font',
+    //-   crossorigin='anonymous'
+    //- )
+    link(rel='preload', href='./css/style.min.css', as='style')
     link(rel='preload', href='./js/script.min.js', as='script')
 
-    link(rel='stylesheet', href='/css/style.min.css')
+    link(rel='stylesheet', href='./css/style.min.css')
     title= page_title
 
   body

@@ -79,6 +79,7 @@ let postcss = require('gulp-postcss'); // big plugin with sub-plugins for workin
 let autoprefixer = require('autoprefixer'); // part of the postcss
 let cssnano = require('cssnano'); // CSS minifier, part of the postcss
 let tailwindcss = require('tailwindcss'); // tailwind cc
+let purgecss = require('gulp-purgecss'); // remove unused selectors from css files (helps to reduce ccs file size when using tailwind, bootstrap, etc.)
 
 // Javascript
 let terser = require('gulp-terser'); // JS minifier
@@ -121,7 +122,7 @@ function browserSync() {
     },
     browser: [
       'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe',
-      'C:\\Program Files\\Firefox Developer Edition\\firefox.exe',
+      // 'C:\\Program Files\\Firefox Developer Edition\\firefox.exe',
     ],
     port: 3000,
     notify: false,
@@ -153,10 +154,16 @@ function compileCSS() {
           outputStyle: 'expanded',
         })
       )
-      .pipe(group_media_queries())
+      // .pipe(group_media_queries())
       //* remove comment bellow to also get non-min css
       // .pipe(dest(path.build.css))
       .pipe(postcss([tailwindcss(), autoprefixer(), cssnano()]))
+      // .pipe(
+      //   purgecss({
+      //     content: ['dist/**/*.html'],
+      //     css: ['dist/css/*.css'],
+      //   })
+      // )
       .pipe(
         rename({
           extname: '.min.css',
