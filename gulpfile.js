@@ -196,7 +196,7 @@ function compileJS() {
 function watchSource() {
   gulp.watch([path.watch.pug], compileHTML);
   gulp.watch([path.watch.sass], compileCSS);
-  gulp.watch([path.watch.js], compileJS);
+  // ! gulp.watch([path.watch.js], compileJS);
 }
 
 // optimize PNG's and JPG's in background_img folder and export them to dist
@@ -324,7 +324,7 @@ function fontsToWOFF2() {
 // clean HTML, CSS and JS folders in dist and compile them anew
 let compileProject = gulp.series(
   clean,
-  gulp.parallel(compileHTML, compileCSS, compileJS)
+  gulp.parallel(compileHTML, compileCSS) // ! compileJS
 );
 
 // start watching: compile the project, than launch browserSync and watchSource

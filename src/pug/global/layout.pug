@@ -1,7 +1,5 @@
-//-  прописать свои шрифты
-
 - var page_language = "ru";
-- var external_font = "Oswald-Regular";
+//- - var external_font = "";
 
 block vars
 
@@ -12,8 +10,9 @@ html(lang=page_language)
     meta(name='description', content=page_decription)
     meta(name='keywords', content=page_keywords)
     meta(name='viewport', content='width=device-width, initial-scale=1.0')
+    meta(http-equiv='X-UA-Compatible', content='IE=edge,chrome=1')
 
-    //- решил использовать веб-безопасный шрифт
+    //- в этом проекте используется веб-безопасный шрифт, прелоад и лоад внешнего шрифта не нужны
     //- link(
     //-   rel='preload',
     //-   href=`/fonts/${external_font}.woff2`,
@@ -21,7 +20,9 @@ html(lang=page_language)
     //-   crossorigin='anonymous'
     //- )
     link(rel='preload', href='./css/style.min.css', as='style')
-    link(rel='preload', href='./js/script.min.js', as='script')
+
+    //- очень простой и быстрый проект, JS не нужен. Но мб добавлю его позже (в gulp он тоже выключен из билда)
+    //- link(rel='preload', href='./js/script.min.js', as='script')
 
     link(rel='stylesheet', href='./css/style.min.css')
     title= page_title
@@ -29,4 +30,5 @@ html(lang=page_language)
   body
     block content
 
-    script(src='./js/script.min.js')
+    //- JSа нет, см. выше
+    //- script(src='./js/script.min.js')
