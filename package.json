@@ -13,6 +13,7 @@
     "eslint": "^7.12.1",
     "eslint-config-prettier": "^6.15.0",
     "gulp": "^4.0.2",
+    "gulp-cache-bust": "^1.4.1",
     "gulp-cheerio": "^1.0.0",
     "gulp-dart-sass": "^1.0.2",
     "gulp-file-include": "^2.2.2",
