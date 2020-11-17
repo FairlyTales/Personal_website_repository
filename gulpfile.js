@@ -336,8 +336,8 @@ const dist = {
         .pipe(postcss([tailwindcss(), autoprefixer(), cssnano()]))
         .pipe(
           purgecss({
-            content: ['dist/**/*.html'],
-            css: ['dist/css/*.css'],
+            content: ['src/pug/*.pug', 'dist/*.html'],
+            safelist: [/^skills2/, /^sm/, /^md/, /^lg/, /^xl/], // page-size selectors are safelisted
           })
         )
         .pipe(
