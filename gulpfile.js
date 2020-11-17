@@ -303,24 +303,56 @@ const build = {
   },
 };
 
+const purgeSafelist = [
+  'skills2:w-1/2',
+  'sm:flex-row',
+  'sm:w-1/3',
+  'sm:pr-8',
+  'sm:py-8',
+  'sm:w-2/3',
+  'sm:pl-8',
+  'sm:border-l',
+  'sm:border-t-0',
+  'sm:mt-0',
+  'sm:text-left',
+  'sm:text-3xl',
+  'sm:mx-auto',
+  'sm:mb-2',
+  'sm:w-10/12',
+  'md:w-1/2',
+  'lg:w-4/6',
+  'lg:w-3/4',
+  'lg:w-4/5',
+  'lg:w-1/3',
+  'lg:w-1/2',
+  'xl:w-1/3',
+  'hover:text-orange-600',
+  'hover:bg-orange-700',
+  'hover:text-white ',
+  'active:bg-orange-900',
+  'active:text-orange-800',
+];
+
 // dist methods
 const dist = {
   // compile PUG and send compiled HTML to dist
   HTML: () => {
-    return src(path.src.pug)
-      .pipe(plumber())
-      .pipe(
-        pug({
-          doctype: 'html',
-        })
-      )
-      .pipe(minifyHTML())
-      .pipe(
-        cacheBust({
-          type: 'timestamp',
-        })
-      )
-      .pipe(dest(path.dist.html));
+    return (
+      src(path.src.pug)
+        .pipe(plumber())
+        .pipe(
+          pug({
+            doctype: 'html',
+          })
+        )
+        .pipe(minifyHTML())
+        // .pipe(
+        //   cacheBust({
+        //     type: 'timestamp',
+        //   })
+        // )
+        .pipe(dest(path.dist.html))
+    );
   },
   // compile SCSS and send min.CSS to dist
   CSS: () => {
@@ -337,7 +369,7 @@ const dist = {
         .pipe(
           purgecss({
             content: ['src/pug/*.pug', 'dist/*.html'],
-            safelist: [/^skills2/, /^sm/, /^md/, /^lg/, /^xl/], // page-size selectors are safelisted
+            safelist: purgeSafelist, // page-size selectors are safelisted
           })
         )
         .pipe(
@@ -345,30 +377,32 @@ const dist = {
             extname: '.min.css',
           })
         )
-        .pipe(
-          cacheBust({
-            type: 'timestamp',
-          })
-        )
+        // .pipe(
+        //   cacheBust({
+        //     type: 'timestamp',
+        //   })
+        // )
         .pipe(dest(path.dist.css))
     );
   },
   // compile JS and send min.js to dist
   JS: () => {
-    return src(path.src.js)
-      .pipe(plumber())
-      .pipe(terser())
-      .pipe(
-        rename({
-          extname: '.min.js',
-        })
-      )
-      .pipe(
-        cacheBust({
-          type: 'timestamp',
-        })
-      )
-      .pipe(dest(path.dist.js));
+    return (
+      src(path.src.js)
+        .pipe(plumber())
+        .pipe(terser())
+        .pipe(
+          rename({
+            extname: '.min.js',
+          })
+        )
+        // .pipe(
+        //   cacheBust({
+        //     type: 'timestamp',
+        //   })
+        // )
+        .pipe(dest(path.dist.js))
+    );
   },
 
   // * ----- Images -----
