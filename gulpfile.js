@@ -1,11 +1,50 @@
 // *
-// * --------File Paths--------
+// * -------- Plugins --------
+// *
+
+//  general
+const gulp = require('gulp');
+const { src, dest } = require('gulp'); // assign gulp.src and gulp.dest to use them as src and dest (without prefix - gulp.)
+const plumber = require('gulp-plumber'); // prevents gulp from crushing when encountered with error in the pipeline
+const del = require('del'); // plugin for deleting files
+const rename = require('gulp-rename'); // plugin for renameing files
+const browsersync = require('browser-sync').create();
+const cacheBust = require('gulp-cache-bust'); // adds cache bust, we use it for dist
+
+//  Pug, HTML
+const pug = require('gulp-pug');
+const minifyHTML = require('gulp-htmlmin');
+
+//  CSS, SASS
+const sass = require('gulp-dart-sass');
+const group_media_queries = require('gulp-group-css-media-queries'); // combines all media queries in a right way and puts them at the bottom of the stylesheet
+const postcss = require('gulp-postcss'); // big plugin with sub-plugins for working with CSS
+const autoprefixer = require('autoprefixer'); // part of the postcss
+const cssnano = require('cssnano'); // CSS minifier, part of the postcss
+const tailwindcss = require('tailwindcss'); // tailwind cc
+const purgecss = require('gulp-purgecss'); // remove unused selectors from css files
+
+//  Javascript
+const terser = require('gulp-terser'); // JS minifier
+
+//  Images
+const imagemin = require('gulp-imagemin'); // image minificator
+const webp = require('gulp-webp'); // convert jpg and png to webp
+const svgSprite = require('gulp-svg-sprite'); // sprite creation
+const cheerio = require('gulp-cheerio'); // HMTL/XML parser based on jQuery, we use it to remove unnecessary attributes from svg
+const replace = require('gulp-replace'); // string replacement plugin, we use it to fix one particular bug in cheerio's symbol conversion algorithm
+
+//  Fonts
+const ttf2woff = require('gulp-ttf2woff');
+const ttf2woff2 = require('gulp-ttf2woff2');
+
+// *
+// * -------- File Paths --------
 // *
 
 const source_folder = 'src';
 const build_folder = 'build';
 const dist_folder = 'dist';
-
 const path = {
   src: {
     // '!' - don't include files starting with '_'(underscore)
@@ -85,52 +124,12 @@ const path = {
 };
 
 // *
-// * --------Plugins--------
-// *
-
-// general
-const gulp = require('gulp');
-const { src, dest } = require('gulp'); // assign gulp.src and gulp.dest to use them as src and dest (without prefix - gulp.)
-const plumber = require('gulp-plumber'); // prevents gulp from crushing when encountered with error in the pipeline
-const del = require('del'); // plugin for deleting files
-const rename = require('gulp-rename'); // plugin for renameing files
-const browsersync = require('browser-sync').create();
-const cacheBust = require('gulp-cache-bust'); // adds cache bust, we use it for dist
-
-// Pug, HTML
-const pug = require('gulp-pug');
-const minifyHTML = require('gulp-htmlmin');
-
-// CSS, SASS
-const sass = require('gulp-dart-sass');
-const group_media_queries = require('gulp-group-css-media-queries'); // combines all media queries in a right way and puts them at the bottom of the stylesheet
-const postcss = require('gulp-postcss'); // big plugin with sub-plugins for working with CSS
-const autoprefixer = require('autoprefixer'); // part of the postcss
-const cssnano = require('cssnano'); // CSS minifier, part of the postcss
-const tailwindcss = require('tailwindcss'); // tailwind cc
-const purgecss = require('gulp-purgecss'); // remove unused selectors from css files (helps to reduce ccs file size when using tailwind, bootstrap, etc.)
-
-// Javascript
-const terser = require('gulp-terser'); // JS minifier
-
-// Images
-const imagemin = require('gulp-imagemin'); // image minificator
-const webp = require('gulp-webp'); // convert jpg and png to webp
-const svgSprite = require('gulp-svg-sprite'); // sprite creation
-const cheerio = require('gulp-cheerio'); // HMTL/XML parser based on jQuery, we use it to remove unnecessary attributes from svg
-const replace = require('gulp-replace'); // string replacement plugin, we use it to fix one particular bug in cheerio's symbol conversion algorithm
-
-// Fonts
-const ttf2woff = require('gulp-ttf2woff');
-const ttf2woff2 = require('gulp-ttf2woff2');
-
-// *
-// * --------Private tasks--------
+// * -------- Private tasks --------
 // *
 
 // build methods
 const build = {
-  // compile PUG and send compiled HTML files to build, call browsersync
+  // compile PUG and send resulting HTML files to build, call browsersync
   HTML: () => {
     return src(path.src.pug)
       .pipe(plumber())
@@ -142,7 +141,7 @@ const build = {
       .pipe(dest(path.build.html))
       .pipe(browsersync.stream());
   },
-  // compile SCSS and send not actually minified min.CSS file to build, call browsersync
+  // compile SCSS and send not actually minified min.CSS to build, call browsersync
   CSS: () => {
     return (
       src(path.src.sass)
@@ -163,7 +162,7 @@ const build = {
         .pipe(browsersync.stream())
     );
   },
-  // compile JS and send not actually minified min.js file to build, call browsersync
+  // compile JS and send not actually minified min.js to build, call browsersync
   JS: () => {
     return src(path.src.js)
       .pipe(plumber())
@@ -187,6 +186,12 @@ const build = {
         ])
       )
       .pipe(dest(path.build.background_img));
+  },
+  backgroundSvg: () => {
+    return src(path.src.background_svg)
+      .pipe(plumber())
+      .pipe(imagemin([imagemin.svgo()]))
+      .pipe(dest(path.build.background_svg));
   },
   contentImg: () => {
     return src(path.src.content_img)
@@ -217,18 +222,6 @@ const build = {
         // )
         .pipe(dest(path.build.content_img))
     );
-  },
-  backgroundSvg: () => {
-    return src(path.src.background_svg)
-      .pipe(plumber())
-      .pipe(imagemin([imagemin.svgo()]))
-      .pipe(dest(path.build.background_svg));
-  },
-  backgroundSvg: () => {
-    return src(path.src.background_svg)
-      .pipe(plumber())
-      .pipe(imagemin([imagemin.svgo()]))
-      .pipe(dest(path.build.background_svg));
   },
   contentSvg: () => {
     return src(path.src.content_svg)
@@ -312,7 +305,7 @@ const build = {
 
 // dist methods
 const dist = {
-  // compile PUG and send compiled HTML files to dist
+  // compile PUG and send compiled HTML to dist
   HTML: () => {
     return src(path.src.pug)
       .pipe(plumber())
@@ -329,7 +322,7 @@ const dist = {
       )
       .pipe(dest(path.dist.html));
   },
-  // compile SCSS and send CSS and min.CSS files to dist
+  // compile SCSS and send min.CSS to dist
   CSS: () => {
     return (
       src(path.src.sass)
@@ -341,14 +334,12 @@ const dist = {
         )
         // .pipe(group_media_queries()) // ! current version is not working
         .pipe(postcss([tailwindcss(), autoprefixer(), cssnano()]))
-
-        // ! запустить purgeCSS !
-        // .pipe(
-        //   purgecss({
-        //     content: ['dist/**/*.html'],
-        //     css: ['dist/css/*.css'],
-        //   })
-        // )
+        .pipe(
+          purgecss({
+            content: ['dist/**/*.html'],
+            css: ['dist/css/*.css'],
+          })
+        )
         .pipe(
           rename({
             extname: '.min.css',
@@ -362,7 +353,7 @@ const dist = {
         .pipe(dest(path.dist.css))
     );
   },
-  // compile JS and send it and min.js files to dist, call browsersync
+  // compile JS and send min.js to dist
   JS: () => {
     return src(path.src.js)
       .pipe(plumber())
@@ -391,6 +382,12 @@ const dist = {
         ])
       )
       .pipe(dest(path.dist.background_img));
+  },
+  backgroundSvg: () => {
+    return src(path.src.background_svg)
+      .pipe(plumber())
+      .pipe(imagemin([imagemin.svgo()]))
+      .pipe(dest(path.dist.background_svg));
   },
   contentImg: () => {
     return src(path.src.content_img)
@@ -422,12 +419,6 @@ const dist = {
         .pipe(dest(path.dist.content_img))
     );
   },
-  backgroundSvg: () => {
-    return src(path.src.background_svg)
-      .pipe(plumber())
-      .pipe(imagemin([imagemin.svgo()]))
-      .pipe(dest(path.dist.background_svg));
-  },
   contentSvg: () => {
     return src(path.src.content_svg)
       .pipe(plumber())
@@ -452,7 +443,7 @@ const dist = {
             parserOptions: { xmlMode: true },
           })
         )
-        // cheerio has a bug - sometimes it converts the symbol '>' to the encoding '& gt;', we use replace to fix this
+        // cheerio has a bug - sometimes it converts the symbol '>' to the encoding '& gt;', we use replace plugin to fix this
         .pipe(replace('&gt;', '>'))
         .pipe(
           svgSprite({
@@ -474,21 +465,21 @@ const dist = {
   },
 
   // * ----- Fonts -----
-  // converts TTF fonts to WOFF and exports them to build
+  // converts TTF fonts to WOFF and exports them to dist
   ttfToWoff: () => {
     return src(path.src.ttfFonts)
       .pipe(plumber())
       .pipe(ttf2woff())
       .pipe(dest(path.dist.fonts));
   },
-  // converts TTF fonts to WOFF2 and exports them to build
+  // converts TTF fonts to WOFF2 and exports them to dist
   ttfToWoff2: () => {
     return src(path.src.ttfFonts)
       .pipe(plumber())
       .pipe(ttf2woff2())
       .pipe(dest(path.dist.fonts));
   },
-  // send woff and woff2 fonts from src to build
+  // send woff and woff2 fonts from src to dist
   parseWoffFonts: () => {
     return src(path.src.woffFonts).pipe(plumber()).pipe(dest(path.dist.fonts));
   },
@@ -569,6 +560,8 @@ const distProject = gulp.series(
     dist.contentImgWebp,
     dist.contentSvg,
 
+    dist.createSvgSprite,
+
     dist.ttfToWoff,
     dist.ttfToWoff2,
     dist.parseWoffFonts
@@ -579,10 +572,10 @@ const distProject = gulp.series(
 // * -------- Exports --------
 // *
 
-// * gulp, gulp img, gulp sprite, gulp font, gulp dist
-
 exports.default = watchProject;
 exports.img = buildImg;
 exports.sprite = buildSprite;
 exports.font = buildFonts;
 exports.dist = distProject;
+
+// ! list of commands: gulp, gulp img, gulp sprite, gulp font, gulp dist

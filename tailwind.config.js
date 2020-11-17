@@ -4,10 +4,10 @@ module.exports = {
     // purgeLayersByDefault: true,
   },
   purge: [
-    {
-      enabled: true,
-      content: ['./dist/*.html', './src/pug/index.pug'],
-    },
+    // {
+    //   enabled: true,
+    //   content: ['./dist/*.html', './src/pug/index.pug'],
+    // },
   ],
   theme: {
     screens: {
