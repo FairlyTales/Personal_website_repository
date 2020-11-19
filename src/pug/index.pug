@@ -14,6 +14,9 @@ block vars
 
 block content
   main
+    h1.visually-hidden
+      | Frontend разработчик Хнычкин Кирилл, г. Москва.
+
     //- вступление
     section.text-gray-200.bg-gray-900.body-font
       .container.px-5.py-10.mx-auto.flex.flex-col
@@ -49,9 +52,7 @@ block content
     section.text-gray-200.bg-gray-900.body-font
       .container.px-5.py-10.mx-auto
         .text-center.mb-10
-          h1.text-2xl.font-medium.text-center.title-font.text-white.mb-4(
-            class='sm:text-3xl'
-          ) Навыки
+          h2.text-2xl.font-medium.text-center.title-font.text-white(class='sm:text-3xl') Навыки
           //- I don't think this text looks good on the page
           //- p.text-xl.leading-relaxed.mx-auto(class='lg:w-3/4')
             | Окончил кафедру ИУ-11 МГТУ им. Баумана. Обучался по материалам
@@ -329,7 +330,7 @@ block content
 
     //- проекты
     section.text-gray-200.bg-gray-900.body-font
-      h1.px-5.pt-10.text-2xl.font-medium.text-center.title-font.text-white(
+      h2.px-5.pt-10.text-2xl.font-medium.text-center.title-font.text-white(
         class='sm:text-3xl'
       ) Проекты
       .container.px-5.py-10.mx-auto
@@ -489,7 +490,7 @@ block content
     section.text-gray-200.bg-gray-900.body-font.pb-64
       .container.px-5.py-10.mx-auto.flex.flex-wrap
         .flex.flex-col.text-center.w-full.mb-10
-          h1.text-2xl.font-medium.title-font.text-white(class='sm:text-3xl') Контакты
+          h2.text-2xl.font-medium.title-font.text-white(class='sm:text-3xl') Контакты
         .flex.flex-wrap.justify-center.w-full
           //- почта
           .p-4.w-full(class='sm:w-10/12 lg:w-1/2 xl:w-1/3')
