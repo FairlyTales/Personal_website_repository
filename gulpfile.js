@@ -57,6 +57,7 @@ const path = {
     content_svg: source_folder + '/img/content_svg/*.svg',
     background_svg: source_folder + '/img/background_svg/*.svg',
     sprite: source_folder + '/img/sprite/*.svg',
+    favicon: source_folder + '/img/favicon/*.{png,ico}',
     ttfFonts: source_folder + '/fonts/**/*.ttf',
     woffFonts: source_folder + '/fonts/**/*.{woff,woff2}',
   },
@@ -70,6 +71,7 @@ const path = {
     content_svg: build_folder + '/img/content_svg/',
     background_svg: build_folder + '/img/background_svg/',
     sprite: build_folder + '/img/sprite/',
+    favicon: build_folder + '/img/favicon/',
     fonts: build_folder + '/fonts/',
   },
 
@@ -83,6 +85,7 @@ const path = {
     content_svg: dist_folder + '/img/content_svg/',
     background_svg: dist_folder + '/img/background_svg/',
     sprite: dist_folder + '/img/sprite/',
+    favicon: dist_folder + '/img/favicon/',
     fonts: dist_folder + '/fonts/',
   },
 
@@ -92,25 +95,23 @@ const path = {
     js: source_folder + '/js/**/*.js',
   },
 
-  // path for cleaning build HTML, CSS and JS folders content before compiling new versions of them
+  // cleaning HTML, CSS and JS
   clean_build: [
     build_folder + '/html/',
     build_folder + '/css/',
     build_folder + '/js/',
   ],
 
-  // path for cleaning dist img folder before optimizing and sending new images to it
   clean_build_img: [
     build_folder + '/img/background_img/*',
     build_folder + '/img/content_img/*',
     build_folder + '/img/background_svg/*',
     build_folder + '/img/content_img/*',
+    build_folder + '/img/favicon/*',
   ],
 
-  // path for cleaning sprite folder
   clean_build_sprite: [build_folder + '/img/background_img/sprite/*'],
 
-  // path for cleaning dist
   clean_dist: [
     dist_folder + '/html/',
     dist_folder + '/css/',
@@ -119,7 +120,9 @@ const path = {
     dist_folder + '/img/content_img/*',
     dist_folder + '/img/background_svg/*',
     dist_folder + '/img/content_img/*',
-    dist_folder + '/img/background_img/sprite/*',
+    dist_folder + '/img/sprite/*',
+    dist_folder + '/img/favicon/*',
+    dist_folder + '/img/fonts/*',
   ],
 };
 
@@ -229,6 +232,9 @@ const build = {
       .pipe(imagemin([imagemin.svgo()]))
       .pipe(dest(path.build.content_svg));
   },
+  favicons: () => {
+    return src(path.src.favicon).pipe(plumber()).pipe(dest(path.build.favicon));
+  },
 
   // * ----- Sprite -----
   createSvgSprite: () => {
@@ -303,7 +309,8 @@ const build = {
   },
 };
 
-const purgeSafelist = [
+// list of classes whitelisted by purgeCSS
+const purgeCSSSafelist = [
   'skills2:w-1/2',
   'sm:flex-row',
   'sm:w-1/3',
@@ -331,6 +338,7 @@ const purgeSafelist = [
   'hover:text-white ',
   'active:bg-orange-900',
   'active:text-orange-800',
+  'you_already_here--active',
 ];
 
 // dist methods
@@ -369,7 +377,7 @@ const dist = {
         .pipe(
           purgecss({
             content: ['src/pug/*.pug', 'dist/*.html'],
-            safelist: purgeSafelist, // page-size selectors are safelisted
+            safelist: purgeCSSSafelist, // page-size selectors are safelisted
           })
         )
         .pipe(
@@ -459,6 +467,9 @@ const dist = {
       .pipe(imagemin([imagemin.svgo()]))
       .pipe(dest(path.dist.content_svg));
   },
+  favicons: () => {
+    return src(path.src.favicon).pipe(plumber()).pipe(dest(path.dist.favicon));
+  },
 
   //* ----- Sprite -----
   createSvgSprite: () => {
@@ -543,20 +554,16 @@ function browserSync() {
 function watchSource() {
   gulp.watch([path.watch.pug], build.HTML);
   gulp.watch([path.watch.sass], build.CSS);
-  // gulp.watch([path.watch.js], build.JS); // ! don't currently have any JS in the project
+  gulp.watch([path.watch.js], build.JS);
 }
 
 // *
 // * --------Public tasks--------
 // *
 
-// clean build, compile build, launch browserSync and start watching src
 const watchProject = gulp.parallel(
   // this .series compiles HTML, CSS and JS
-  gulp.series(
-    build.clean,
-    gulp.parallel(build.HTML, build.CSS) // ! 'build.JS' is currently excluded from this gulp.parellel() because we don't use any JS in the project
-  ),
+  gulp.series(build.clean, gulp.parallel(build.HTML, build.CSS, build.JS)),
   watchSource,
   browserSync
 );
@@ -568,7 +575,8 @@ const buildImg = gulp.series(
     build.backgroundSvg,
     build.contentImg,
     build.contentImgWebp,
-    build.contentSvg
+    build.contentSvg,
+    build.favicons
   )
 );
 
@@ -580,21 +588,20 @@ const buildFonts = gulp.parallel(
   build.parseWoffFonts
 );
 
-// clean dist folder and assemble it anew
 const distProject = gulp.series(
   dist.clean,
   gulp.parallel(
     dist.HTML,
     dist.CSS,
-    // dist.JS, // ! 'dist.JS' is currently excluded from dist assembly because we don't have any JS in the project
+    dist.JS,
 
     dist.backgroundImg,
     dist.backgroundSvg,
     dist.contentImg,
     dist.contentImgWebp,
     dist.contentSvg,
-
     dist.createSvgSprite,
+    dist.favicons,
 
     dist.ttfToWoff,
     dist.ttfToWoff2,

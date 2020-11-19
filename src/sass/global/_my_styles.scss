@@ -27,8 +27,52 @@
   text-align: center;
 }
 
+.you_already_here {
+  position: relative;
+}
+
+.you_already_here--active::after {
+  position: absolute;
+  top: -130px;
+  left: 0;
+
+  width: 16.65rem;
+
+  padding: 1.7rem 1.25rem;
+
+  content: 'Вы находитесь на нём прямо сейчас';
+
+  background-color: #c05621;
+  border-radius: 0.25rem;
+
+  animation: popup 0.1s;
+}
+
+.you_already_here--active:active::after {
+  background-color: #7b341e;
+}
+
 @media (min-width: '427px') {
   .text-to-left {
     text-align: left;
+  }
+}
+
+@keyframes popup {
+  0% {
+    transform: translateY(40%);
+  }
+  50% {
+  }
+  60% {
+  }
+  70% {
+  }
+  80% {
+  }
+  90% {
+  }
+  100% {
+    transform: translateY(0);
   }
 }
