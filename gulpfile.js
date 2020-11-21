@@ -43,8 +43,8 @@ const ttf2woff2 = require('gulp-ttf2woff2');
 
 // also change file versions in layout.pug
 const fileVersion = {
-  js: '1',
   css: '1.1',
+  js: '1',
 };
 
 const source_folder = 'src';
@@ -387,7 +387,7 @@ const dist = {
       .pipe(terser())
       .pipe(
         rename({
-          extname: `.v${fileVersion.css}.min.js`,
+          extname: `.v${fileVersion.js}.min.js`,
         })
       )
       .pipe(dest(path.dist.js));
