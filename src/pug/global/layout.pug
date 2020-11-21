@@ -1,4 +1,6 @@
 - var page_language = "ru";
+- var css_version = "1.1";
+- var js_version = "1";
 //- - var external_font = "";
 
 block vars
@@ -25,12 +27,12 @@ html(lang=page_language)
     //-   as='font',
     //-   crossorigin='anonymous'
     //- )
-    link(rel='preload', href='./css/style.min.css?v1', as='style')
+    link(rel='preload', href=`./css/style.v${css_version}.min.css`, as='style')
 
     //- очень простой и быстрый проект, JS не нужен. Но мб добавлю его позже (в gulp он тоже выключен из билда)
     //- link(rel='preload', href='./js/script.min.js', as='script')
 
-    link(rel='stylesheet', href='./css/style.min.css?v1')
+    link(rel='stylesheet', href=`./css/style.v${css_version}.min.css`)
 
     //- Favicon code, from favicomatic.com. Always check and correct file paths after copying code from this site
     link(
@@ -84,4 +86,4 @@ html(lang=page_language)
   body
     block content
 
-    script(src='./js/script.min.js', type='text/javascript')
+    script(src=`./js/script.v${js_version}.min.js`, type='text/javascript')

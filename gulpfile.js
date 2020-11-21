@@ -9,7 +9,7 @@ const plumber = require('gulp-plumber'); // prevents gulp from crushing when enc
 const del = require('del'); // plugin for deleting files
 const rename = require('gulp-rename'); // plugin for renameing files
 const browsersync = require('browser-sync').create();
-const cacheBust = require('gulp-cache-bust'); // adds cache bust, we use it for dist
+const replace = require('gulp-replace'); // string replacement plugin, we use it to fix one particular bug in gulp-cheerio's symbol conversion algorithm
 
 //  Pug, HTML
 const pug = require('gulp-pug');
@@ -32,15 +32,20 @@ const imagemin = require('gulp-imagemin'); // image minificator
 const webp = require('gulp-webp'); // convert jpg and png to webp
 const svgSprite = require('gulp-svg-sprite'); // sprite creation
 const cheerio = require('gulp-cheerio'); // HMTL/XML parser based on jQuery, we use it to remove unnecessary attributes from svg
-const replace = require('gulp-replace'); // string replacement plugin, we use it to fix one particular bug in cheerio's symbol conversion algorithm
 
 //  Fonts
 const ttf2woff = require('gulp-ttf2woff');
 const ttf2woff2 = require('gulp-ttf2woff2');
 
 // *
-// * -------- File Paths --------
+// * -------- File Paths, file names --------
 // *
+
+// also change file versions in layout.pug
+const fileVersion = {
+  js: '1',
+  css: '1.1',
+};
 
 const source_folder = 'src';
 const build_folder = 'build';
@@ -126,13 +131,44 @@ const path = {
   ],
 };
 
+// list of classes whitelisted by purgeCSS
+const purgeCssSafelist = [
+  'skills2:w-1/2',
+  'sm:flex-row',
+  'sm:w-1/3',
+  'sm:pr-8',
+  'sm:py-8',
+  'sm:w-2/3',
+  'sm:pl-8',
+  'sm:border-l',
+  'sm:border-t-0',
+  'sm:mt-0',
+  'sm:text-left',
+  'sm:text-3xl',
+  'sm:mx-auto',
+  'sm:mb-2',
+  'sm:w-10/12',
+  'md:w-1/2',
+  'lg:w-4/6',
+  'lg:w-3/4',
+  'lg:w-4/5',
+  'lg:w-1/3',
+  'lg:w-1/2',
+  'xl:w-1/3',
+  'hover:text-orange-600',
+  'hover:bg-orange-700',
+  'hover:text-white ',
+  'active:bg-orange-900',
+  'active:text-orange-800',
+  'you_already_here--active',
+];
+
 // *
 // * -------- Private tasks --------
 // *
 
 // build methods
 const build = {
-  // compile PUG and send resulting HTML files to build, call browsersync
   HTML: () => {
     return src(path.src.pug)
       .pipe(plumber())
@@ -144,7 +180,6 @@ const build = {
       .pipe(dest(path.build.html))
       .pipe(browsersync.stream());
   },
-  // compile SCSS and send not actually minified min.CSS to build, call browsersync
   CSS: () => {
     return (
       src(path.src.sass)
@@ -158,20 +193,19 @@ const build = {
         .pipe(postcss([tailwindcss(), autoprefixer()]))
         .pipe(
           rename({
-            extname: '.min.css',
+            extname: `.v${fileVersion.css}.min.css`,
           })
         )
         .pipe(dest(path.build.css))
         .pipe(browsersync.stream())
     );
   },
-  // compile JS and send not actually minified min.js to build, call browsersync
   JS: () => {
     return src(path.src.js)
       .pipe(plumber())
       .pipe(
         rename({
-          extname: '.min.js',
+          extname: `.v${fileVersion.js}.min.js`,
         })
       )
       .pipe(dest(path.build.js))
@@ -309,60 +343,19 @@ const build = {
   },
 };
 
-// list of classes whitelisted by purgeCSS
-const purgeCSSSafelist = [
-  'skills2:w-1/2',
-  'sm:flex-row',
-  'sm:w-1/3',
-  'sm:pr-8',
-  'sm:py-8',
-  'sm:w-2/3',
-  'sm:pl-8',
-  'sm:border-l',
-  'sm:border-t-0',
-  'sm:mt-0',
-  'sm:text-left',
-  'sm:text-3xl',
-  'sm:mx-auto',
-  'sm:mb-2',
-  'sm:w-10/12',
-  'md:w-1/2',
-  'lg:w-4/6',
-  'lg:w-3/4',
-  'lg:w-4/5',
-  'lg:w-1/3',
-  'lg:w-1/2',
-  'xl:w-1/3',
-  'hover:text-orange-600',
-  'hover:bg-orange-700',
-  'hover:text-white ',
-  'active:bg-orange-900',
-  'active:text-orange-800',
-  'you_already_here--active',
-];
-
 // dist methods
 const dist = {
-  // compile PUG and send compiled HTML to dist
   HTML: () => {
-    return (
-      src(path.src.pug)
-        .pipe(plumber())
-        .pipe(
-          pug({
-            doctype: 'html',
-          })
-        )
-        .pipe(minifyHTML())
-        // .pipe(
-        //   cacheBust({
-        //     type: 'timestamp',
-        //   })
-        // )
-        .pipe(dest(path.dist.html))
-    );
+    return src(path.src.pug)
+      .pipe(plumber())
+      .pipe(
+        pug({
+          doctype: 'html',
+        })
+      )
+      .pipe(minifyHTML())
+      .pipe(dest(path.dist.html));
   },
-  // compile SCSS and send min.CSS to dist
   CSS: () => {
     return (
       src(path.src.sass)
@@ -377,40 +370,27 @@ const dist = {
         .pipe(
           purgecss({
             content: ['src/pug/*.pug', 'dist/*.html'],
-            safelist: purgeCSSSafelist, // page-size selectors are safelisted
+            safelist: purgeCssSafelist,
           })
         )
         .pipe(
           rename({
-            extname: '.min.css',
+            extname: `.v${fileVersion.css}.min.css`,
           })
         )
-        // .pipe(
-        //   cacheBust({
-        //     type: 'timestamp',
-        //   })
-        // )
         .pipe(dest(path.dist.css))
     );
   },
-  // compile JS and send min.js to dist
   JS: () => {
-    return (
-      src(path.src.js)
-        .pipe(plumber())
-        .pipe(terser())
-        .pipe(
-          rename({
-            extname: '.min.js',
-          })
-        )
-        // .pipe(
-        //   cacheBust({
-        //     type: 'timestamp',
-        //   })
-        // )
-        .pipe(dest(path.dist.js))
-    );
+    return src(path.src.js)
+      .pipe(plumber())
+      .pipe(terser())
+      .pipe(
+        rename({
+          extname: `.v${fileVersion.css}.min.js`,
+        })
+      )
+      .pipe(dest(path.dist.js));
   },
 
   // * ----- Images -----
