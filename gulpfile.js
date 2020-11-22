@@ -43,7 +43,7 @@ const ttf2woff2 = require('gulp-ttf2woff2');
 
 // also change file versions in layout.pug
 const fileVersion = {
-  css: '1.1',
+  css: '1.1.1',
   js: '1',
 };
 
@@ -135,6 +135,7 @@ const path = {
 const purgeCssSafelist = [
   'skills2:w-1/2',
   'sm:flex-row',
+  'sm:w-1/2',
   'sm:w-1/3',
   'sm:pr-8',
   'sm:py-8',
@@ -150,11 +151,13 @@ const purgeCssSafelist = [
   'sm:w-10/12',
   'md:w-1/2',
   'lg:w-4/6',
+  'lg:w-1/4',
   'lg:w-3/4',
   'lg:w-4/5',
   'lg:w-1/3',
   'lg:w-1/2',
   'xl:w-1/3',
+  'xl:w-1/5',
   'hover:text-orange-600',
   'hover:bg-orange-700',
   'hover:text-white ',
